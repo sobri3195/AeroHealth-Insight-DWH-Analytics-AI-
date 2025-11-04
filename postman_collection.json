@@ -1,0 +1,472 @@
+{
+  "info": {
+    "name": "AeroHealth Insight API",
+    "description": "Healthcare Analytics & DWH API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.aerohealth.mil/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "KPI",
+      "item": [
+        {
+          "name": "Get KPI Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/kpi/overview?from=2024-01-01&to=2024-01-31&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "kpi", "overview"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Capacity",
+      "item": [
+        {
+          "name": "Get Capacity Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/capacity/metrics?from=2024-01-01&to=2024-01-31&facilityId=&unitType=ALL",
+              "host": ["{{base_url}}"],
+              "path": ["api", "capacity", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                },
+                {
+                  "key": "unitType",
+                  "value": "ALL"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Operations",
+      "item": [
+        {
+          "name": "Get ED Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ops/ed/metrics?from=2024-01-01&to=2024-01-31&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ops", "ed", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Ancillary Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/ops/ancillary/metrics?from=2024-01-01&to=2024-01-31&facilityId=&serviceType=LAB",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ops", "ancillary", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                },
+                {
+                  "key": "serviceType",
+                  "value": "LAB"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quality",
+      "item": [
+        {
+          "name": "Get Quality Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/quality/metrics?from=2024-01-01&to=2024-01-31&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "quality", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "Get Claims Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/claims/summary?period=2024-01&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "claims", "summary"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "2024-01"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Revenue Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/revenue/metrics?from=2024-01-01&to=2024-01-31&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "revenue", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Epidemiology",
+      "item": [
+        {
+          "name": "Get Syndromic Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/epi/syndromic?syndrome=ILI&from=2024-01-01&to=2024-01-31&facilityId=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "epi", "syndromic"],
+              "query": [
+                {
+                  "key": "syndrome",
+                  "value": "ILI"
+                },
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "facilityId",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Epi Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/epi/alerts?facilityId=&severity=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "epi", "alerts"],
+              "query": [
+                {
+                  "key": "facilityId",
+                  "value": ""
+                },
+                {
+                  "key": "severity",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Personnel",
+      "item": [
+        {
+          "name": "Get Personnel Risk Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/personnel/risk-summary?unitId=&from=2024-01-01&to=2024-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "personnel", "risk-summary"],
+              "query": [
+                {
+                  "key": "unitId",
+                  "value": ""
+                },
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Execute Explore Query",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dimensions\": [\"facilityId\", \"date\"],\n  \"measures\": [\"patientCount\", \"avgLOS\"],\n  \"filters\": {},\n  \"timePeriod\": {\n    \"from\": \"2024-01-01\",\n    \"to\": \"2024-01-31\"\n  },\n  \"limit\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/explore/query",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "query"]
+            }
+          }
+        },
+        {
+          "name": "List Saved Views",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/explore/views",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "views"]
+            }
+          }
+        },
+        {
+          "name": "Save View",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monthly Patient Count\",\n  \"description\": \"Patient count by facility per month\",\n  \"query\": {\n    \"dimensions\": [\"facilityId\", \"date\"],\n    \"measures\": [\"patientCount\"]\n  },\n  \"shared\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/explore/views",
+              "host": ["{{base_url}}"],
+              "path": ["api", "explore", "views"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "List Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/catalog/metrics?category=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "catalog", "metrics"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Metric Lineage",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/catalog/lineage/bor",
+              "host": ["{{base_url}}"],
+              "path": ["api", "catalog", "lineage", "bor"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ML",
+      "item": [
+        {
+          "name": "Get Census Forecast",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ml/forecast/census?facilityId=RS_A&horizon=14",
+              "host": ["{{base_url}}"],
+              "path": ["ml", "forecast", "census"],
+              "query": [
+                {
+                  "key": "facilityId",
+                  "value": "RS_A"
+                },
+                {
+                  "key": "horizon",
+                  "value": "14"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Run What-If Scenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"facilityId\": \"RS_A\",\n  \"resourceChanges\": {\n    \"beds\": 10,\n    \"nurses\": 5,\n    \"doctors\": 2\n  },\n  \"timeHorizon\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ml/whatif/scenario",
+              "host": ["{{base_url}}"],
+              "path": ["ml", "whatif", "scenario"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

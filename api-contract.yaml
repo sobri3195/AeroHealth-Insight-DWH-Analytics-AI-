@@ -1,0 +1,1141 @@
+openapi: 3.0.3
+info:
+  title: AeroHealth Insight API
+  description: |
+    Healthcare Analytics & Data Warehouse API for AeroHealth Insight Platform.
+    Provides access to operational KPIs, predictions, epidemiological surveillance, 
+    and self-service analytics with strict governance and row-level security.
+  version: 1.0.0
+  contact:
+    name: AeroHealth API Team
+    email: api@aerohealth.mil
+
+servers:
+  - url: https://api.aerohealth.mil/v1
+    description: Production server
+  - url: https://api-staging.aerohealth.mil/v1
+    description: Staging server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: KPI
+    description: Key Performance Indicators and metrics overview
+  - name: Capacity
+    description: Bed occupancy, census, and capacity management
+  - name: Operations
+    description: Operational metrics (ED, lab, pharmacy TAT)
+  - name: Quality
+    description: Clinical quality and safety metrics
+  - name: Finance
+    description: Financial metrics and claims management
+  - name: Epidemiology
+    description: Surveillance and outbreak detection
+  - name: Personnel
+    description: Personnel health risk metrics (aggregate)
+  - name: Analytics
+    description: Self-service analytics and exploration
+  - name: Catalog
+    description: Data dictionary and lineage
+  - name: ML
+    description: Machine learning predictions and forecasts
+
+paths:
+  /api/kpi/overview:
+    get:
+      tags: [KPI]
+      summary: Get KPI overview
+      description: Returns aggregated KPI metrics across facilities
+      operationId: getKPIOverview
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KPIOverview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/capacity/metrics:
+    get:
+      tags: [Capacity]
+      summary: Get capacity metrics
+      description: Returns bed occupancy rate, ALOS, bed turnover
+      operationId: getCapacityMetrics
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+        - name: unitType
+          in: query
+          schema:
+            type: string
+            enum: [ICU, WARD, ED, ALL]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityMetrics'
+
+  /api/ops/ed/metrics:
+    get:
+      tags: [Operations]
+      summary: Get emergency department metrics
+      description: Returns ED operational metrics including TAT
+      operationId: getEDMetrics
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EDMetrics'
+
+  /api/ops/ancillary/metrics:
+    get:
+      tags: [Operations]
+      summary: Get ancillary services metrics
+      description: Returns lab, radiology, and pharmacy TAT metrics
+      operationId: getAncillaryMetrics
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+        - name: serviceType
+          in: query
+          schema:
+            type: string
+            enum: [LAB, RADIOLOGY, PHARMACY]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AncillaryMetrics'
+
+  /api/quality/metrics:
+    get:
+      tags: [Quality]
+      summary: Get quality metrics
+      description: Returns clinical quality indicators
+      operationId: getQualityMetrics
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualityMetrics'
+
+  /api/finance/claims/summary:
+    get:
+      tags: [Finance]
+      summary: Get claims summary
+      description: Returns BPJS claims summary with approval/denial rates
+      operationId: getClaimsSummary
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+            example: '2024-01'
+        - $ref: '#/components/parameters/FacilityId'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimsSummary'
+
+  /api/finance/revenue/metrics:
+    get:
+      tags: [Finance]
+      summary: Get revenue metrics
+      description: Returns revenue and payer mix metrics
+      operationId: getRevenueMetrics
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevenueMetrics'
+
+  /api/epi/syndromic:
+    get:
+      tags: [Epidemiology]
+      summary: Get syndromic surveillance data
+      description: Returns syndrome-specific surveillance metrics
+      operationId: getSyndromicData
+      parameters:
+        - name: syndrome
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ILI, ISPA, DIARRHEA, ALL]
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+        - $ref: '#/components/parameters/FacilityId'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyndromicData'
+
+  /api/epi/alerts:
+    get:
+      tags: [Epidemiology]
+      summary: Get epidemiological alerts
+      description: Returns active alerts based on threshold violations
+      operationId: getEpiAlerts
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, CRITICAL]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertList'
+
+  /api/personnel/risk-summary:
+    get:
+      tags: [Personnel]
+      summary: Get personnel risk summary
+      description: Returns aggregate risk metrics for personnel (non-PII)
+      operationId: getPersonnelRiskSummary
+      parameters:
+        - name: unitId
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/FromDate'
+        - $ref: '#/components/parameters/ToDate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonnelRiskSummary'
+
+  /api/explore/query:
+    post:
+      tags: [Analytics]
+      summary: Execute self-service analytics query
+      description: Execute semantic layer query with governance
+      operationId: executeExploreQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExploreQuery'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExploreResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/explore/views:
+    get:
+      tags: [Analytics]
+      summary: List saved views
+      description: Returns list of saved analytical views
+      operationId: listViews
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedView'
+
+    post:
+      tags: [Analytics]
+      summary: Save analytical view
+      description: Save a new analytical view
+      operationId: saveView
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveViewRequest'
+      responses:
+        '201':
+          description: View created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+
+  /api/catalog/metrics:
+    get:
+      tags: [Catalog]
+      summary: List metric definitions
+      description: Returns data dictionary of all metrics
+      operationId: listMetrics
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [CAPACITY, OPS, QUALITY, FINANCE, EPI]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetricDefinition'
+
+  /api/catalog/lineage/{metricId}:
+    get:
+      tags: [Catalog]
+      summary: Get metric lineage
+      description: Returns data lineage for a specific metric
+      operationId: getMetricLineage
+      parameters:
+        - name: metricId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricLineage'
+
+  /ml/forecast/census:
+    get:
+      tags: [ML]
+      summary: Get census forecast
+      description: Returns occupancy and LOS predictions
+      operationId: getCensusForecast
+      parameters:
+        - $ref: '#/components/parameters/FacilityId'
+        - name: horizon
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 30
+            default: 14
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CensusForecast'
+        '503':
+          description: ML service unavailable
+
+  /ml/whatif/scenario:
+    post:
+      tags: [ML]
+      summary: Run what-if scenario
+      description: Simulate impact of resource changes
+      operationId: runWhatIfScenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatIfScenario'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatIfResult'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    FacilityId:
+      name: facilityId
+      in: query
+      description: Facility identifier (empty for all facilities based on user access)
+      schema:
+        type: string
+    
+    FromDate:
+      name: from
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+        example: '2024-01-01'
+    
+    ToDate:
+      name: to
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+        example: '2024-01-31'
+
+  schemas:
+    KPIOverview:
+      type: object
+      required:
+        - period
+        - facilities
+        - metrics
+        - lastRefresh
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        facilities:
+          type: array
+          items:
+            type: string
+        metrics:
+          type: object
+          properties:
+            bor:
+              $ref: '#/components/schemas/MetricValue'
+            alos:
+              $ref: '#/components/schemas/MetricValue'
+            bedTurnover:
+              $ref: '#/components/schemas/MetricValue'
+            edTAT:
+              $ref: '#/components/schemas/MetricValue'
+            labTAT:
+              $ref: '#/components/schemas/MetricValue'
+        lastRefresh:
+          type: string
+          format: date-time
+
+    CapacityMetrics:
+      type: object
+      required:
+        - period
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        metrics:
+          type: object
+          properties:
+            bor:
+              $ref: '#/components/schemas/TimeSeriesMetric'
+            alos:
+              $ref: '#/components/schemas/TimeSeriesMetric'
+            bedTurnover:
+              $ref: '#/components/schemas/TimeSeriesMetric'
+            admissions:
+              $ref: '#/components/schemas/TimeSeriesMetric'
+            discharges:
+              $ref: '#/components/schemas/TimeSeriesMetric'
+
+    EDMetrics:
+      type: object
+      required:
+        - period
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        metrics:
+          type: object
+          properties:
+            doorToDoctor:
+              $ref: '#/components/schemas/TATMetric'
+            doorToDisposition:
+              $ref: '#/components/schemas/TATMetric'
+            lwbs:
+              $ref: '#/components/schemas/MetricValue'
+        slaBreaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/SLABreach'
+
+    AncillaryMetrics:
+      type: object
+      required:
+        - serviceType
+        - period
+        - metrics
+      properties:
+        serviceType:
+          type: string
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        metrics:
+          type: object
+          properties:
+            avgTAT:
+              $ref: '#/components/schemas/TATMetric'
+            medianTAT:
+              $ref: '#/components/schemas/TATMetric'
+            p95TAT:
+              $ref: '#/components/schemas/TATMetric'
+            volume:
+              $ref: '#/components/schemas/MetricValue'
+        tatByShift:
+          type: array
+          items:
+            type: object
+            properties:
+              shift:
+                type: string
+              avgMinutes:
+                type: number
+        slaCompliance:
+          type: number
+          format: percentage
+
+    QualityMetrics:
+      type: object
+      required:
+        - period
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        metrics:
+          type: object
+          properties:
+            clinicalPathwayCompliance:
+              $ref: '#/components/schemas/MetricValue'
+            readmission7Day:
+              $ref: '#/components/schemas/MetricValue'
+            readmission30Day:
+              $ref: '#/components/schemas/MetricValue'
+            mortalityRiskAdjusted:
+              $ref: '#/components/schemas/MetricValue'
+        incidentSummary:
+          type: object
+          properties:
+            total:
+              type: integer
+            bySeverity:
+              type: object
+              additionalProperties:
+                type: integer
+
+    ClaimsSummary:
+      type: object
+      required:
+        - period
+        - totalClaims
+        - approvedClaims
+        - deniedClaims
+        - denialReasons
+      properties:
+        period:
+          type: string
+        totalClaims:
+          type: integer
+        approvedClaims:
+          type: integer
+        deniedClaims:
+          type: integer
+        approvedAmount:
+          type: number
+        deniedAmount:
+          type: number
+        denialReasons:
+          type: array
+          items:
+            type: object
+            properties:
+              reason:
+                type: string
+              count:
+                type: integer
+              amount:
+                type: number
+        denialRate:
+          type: number
+          format: percentage
+
+    RevenueMetrics:
+      type: object
+      required:
+        - period
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        metrics:
+          type: object
+          properties:
+            totalRevenue:
+              $ref: '#/components/schemas/MetricValue'
+            cashRevenue:
+              type: number
+            accrualRevenue:
+              type: number
+            margin:
+              $ref: '#/components/schemas/MetricValue'
+        payerMix:
+          type: array
+          items:
+            type: object
+            properties:
+              payer:
+                type: string
+              percentage:
+                type: number
+              amount:
+                type: number
+
+    SyndromicData:
+      type: object
+      required:
+        - syndrome
+        - period
+        - timeSeries
+        - threshold
+        - anomalies
+      properties:
+        syndrome:
+          type: string
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        timeSeries:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              count:
+                type: integer
+              zscore:
+                type: number
+        threshold:
+          type: object
+          properties:
+            warning:
+              type: number
+            critical:
+              type: number
+        anomalies:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              severity:
+                type: string
+                enum: [WARNING, CRITICAL]
+
+    AlertList:
+      type: object
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+        total:
+          type: integer
+
+    Alert:
+      type: object
+      required:
+        - id
+        - type
+        - severity
+        - message
+        - timestamp
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [EPI, SLA, CAPACITY, QUALITY]
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        message:
+          type: string
+        facilityId:
+          type: string
+        metadata:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    PersonnelRiskSummary:
+      type: object
+      required:
+        - period
+        - unitId
+        - riskScore
+        - metrics
+      properties:
+        period:
+          $ref: '#/components/schemas/TimePeriod'
+        unitId:
+          type: string
+        riskScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        metrics:
+          type: object
+          properties:
+            avgBMI:
+              type: number
+            avgBloodPressure:
+              type: object
+              properties:
+                systolic:
+                  type: number
+                diastolic:
+                  type: number
+            complianceRate:
+              type: number
+              format: percentage
+        trend:
+          type: string
+          enum: [IMPROVING, STABLE, DECLINING]
+
+    ExploreQuery:
+      type: object
+      required:
+        - dimensions
+        - measures
+      properties:
+        dimensions:
+          type: array
+          items:
+            type: string
+          example: ['facilityId', 'date', 'serviceType']
+        measures:
+          type: array
+          items:
+            type: string
+          example: ['patientCount', 'avgLOS', 'revenue']
+        filters:
+          type: object
+          additionalProperties: true
+        timePeriod:
+          $ref: '#/components/schemas/TimePeriod'
+        limit:
+          type: integer
+          default: 1000
+          maximum: 10000
+
+    ExploreResult:
+      type: object
+      required:
+        - data
+        - queryTime
+        - rowCount
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+        queryTime:
+          type: number
+        rowCount:
+          type: integer
+        metadata:
+          type: object
+          properties:
+            dimensions:
+              type: array
+              items:
+                type: string
+            measures:
+              type: array
+              items:
+                type: string
+
+    SavedView:
+      type: object
+      required:
+        - id
+        - name
+        - query
+        - createdBy
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        query:
+          $ref: '#/components/schemas/ExploreQuery'
+        shared:
+          type: boolean
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SaveViewRequest:
+      type: object
+      required:
+        - name
+        - query
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        query:
+          $ref: '#/components/schemas/ExploreQuery'
+        shared:
+          type: boolean
+          default: false
+
+    MetricDefinition:
+      type: object
+      required:
+        - id
+        - name
+        - category
+        - formula
+        - unit
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        formula:
+          type: string
+        unit:
+          type: string
+        sourceTables:
+          type: array
+          items:
+            type: string
+        owner:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+
+    MetricLineage:
+      type: object
+      required:
+        - metricId
+        - sources
+        - transformations
+      properties:
+        metricId:
+          type: string
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              table:
+                type: string
+              schema:
+                type: string
+              lastRefresh:
+                type: string
+                format: date-time
+        transformations:
+          type: array
+          items:
+            type: object
+            properties:
+              step:
+                type: string
+              description:
+                type: string
+        dataQuality:
+          type: object
+          properties:
+            completeness:
+              type: number
+            consistency:
+              type: number
+            duplicateRatio:
+              type: number
+
+    CensusForecast:
+      type: object
+      required:
+        - facilityId
+        - forecast
+        - model
+      properties:
+        facilityId:
+          type: string
+        forecast:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              predicted:
+                type: number
+              lower:
+                type: number
+              upper:
+                type: number
+        model:
+          type: object
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            trainedAt:
+              type: string
+              format: date-time
+            metrics:
+              type: object
+              properties:
+                mae:
+                  type: number
+                rmse:
+                  type: number
+                mape:
+                  type: number
+
+    WhatIfScenario:
+      type: object
+      required:
+        - facilityId
+        - resourceChanges
+      properties:
+        facilityId:
+          type: string
+        resourceChanges:
+          type: object
+          properties:
+            beds:
+              type: integer
+            nurses:
+              type: integer
+            doctors:
+              type: integer
+        timeHorizon:
+          type: integer
+          default: 30
+
+    WhatIfResult:
+      type: object
+      required:
+        - scenario
+        - predictions
+      properties:
+        scenario:
+          $ref: '#/components/schemas/WhatIfScenario'
+        predictions:
+          type: object
+          properties:
+            expectedBOR:
+              type: number
+            expectedTAT:
+              type: number
+            capacityUtilization:
+              type: number
+        confidence:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+
+    TimePeriod:
+      type: object
+      required:
+        - from
+        - to
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+
+    MetricValue:
+      type: object
+      required:
+        - value
+        - unit
+      properties:
+        value:
+          type: number
+        unit:
+          type: string
+        change:
+          type: number
+        changePercent:
+          type: number
+
+    TimeSeriesMetric:
+      type: object
+      required:
+        - data
+        - unit
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              value:
+                type: number
+        unit:
+          type: string
+        aggregate:
+          type: object
+          properties:
+            avg:
+              type: number
+            min:
+              type: number
+            max:
+              type: number
+
+    TATMetric:
+      type: object
+      required:
+        - avgMinutes
+        - medianMinutes
+      properties:
+        avgMinutes:
+          type: number
+        medianMinutes:
+          type: number
+        p95Minutes:
+          type: number
+        target:
+          type: number
+        compliance:
+          type: number
+          format: percentage
+
+    SLABreach:
+      type: object
+      required:
+        - metric
+        - timestamp
+        - severity
+      properties:
+        metric:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        actualValue:
+          type: number
+        targetValue:
+          type: number
+        severity:
+          type: string
+          enum: [WARNING, CRITICAL]
+        rootCause:
+          type: string
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Unauthorized"
+
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Forbidden - insufficient permissions"
+
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              details:
+                type: array
+                items:
+                  type: string
